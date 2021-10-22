@@ -1,0 +1,13 @@
+.image {
+    border-radius: 50%;
+}
+
+.people {
+    display: inline-block;
+}
+
+.name {
+    text-align: center;
+    font-size: 20px;
+    font-weight: bold;
+}

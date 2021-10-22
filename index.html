@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Proof of concept</title>
+        <link rel="stylesheet" type="text/css" href="style.css">
+        <script type="text/javascript" src="knockout-3.5.1.js" ></script>
+        <script type="text/javascript" src="script.js" ></script>
+    </head>
+    <body>
+        <div style="text-align: center" data-bind="foreach: images">
+            <div class="people">
+                <img data-bind="attr: { src: image }" class="image" />
+                <div data-bind="text: name" class="name"></div>
+            </div>
+        </div>
+    </body>
+</html>
