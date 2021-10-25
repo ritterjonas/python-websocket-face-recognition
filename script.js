@@ -2,6 +2,14 @@ openSocket = () => {
 
 }
 
+function People(name, image) {
+    var self = this;
+
+    self.name = ko.observable(name);
+    self.image = ko.observable(image);
+    self.timestamp = new Date().getTime();
+}
+
 function ViewModel() {
     var self = this;
 
@@ -9,9 +17,14 @@ function ViewModel() {
 
     self.onMessage = function(response) {
         const arr = JSON.parse(response.data);
-        self.images(ko.utils.arrayMap(arr, function(e) {
-            return { name: e[0], image: `data:image/jpg;base64,${e[1]}` };
-        }));
+        
+        self.images(ko.utils.arrayMap(arr, self.addToArray));
+
+        self.images.sort(function (l, r) { return l.name() > r.name() ? 1 : -1 })
+    }
+
+    self.addToArray = function(item) {
+        return new People(item[0], `data:image/jpg;base64,${item[1]}`);
     }
 
     self.init = function() {

@@ -9,8 +9,8 @@
     <body>
         <div style="text-align: center" data-bind="foreach: images">
             <div class="people">
-                <img data-bind="attr: { src: image }" class="image" />
-                <div data-bind="text: name" class="name"></div>
+                <img data-bind="attr: { src: image() }" class="image" />
+                <div data-bind="text: name()" class="name"></div>
             </div>
         </div>
     </body>

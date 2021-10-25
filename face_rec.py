@@ -16,6 +16,7 @@ import json
 PROCESSES = []
 KNOWN_FACES_DIR = "known_faces"
 UNKNOWN_FACES_DIR = "unknown_faces"
+ACCEPTED_FILES = [".png", ".jpg", ".jpeg"]
 
 def log(message):
     print("[LOG] " + str(dt.now()) + " - " + message)
@@ -32,10 +33,12 @@ def camera(man):
 
     log("loading faces")
     for filename in os.listdir(KNOWN_FACES_DIR):
-        image = face_recognition.load_image_file(f"{KNOWN_FACES_DIR}/{filename}")
-        encoding = face_recognition.face_encodings(image)[0]
-        known_faces.append(encoding)
-        known_names.append(os.path.splitext(filename)[0])
+        if (os.path.splitext(filename)[1] in ACCEPTED_FILES):
+            image = face_recognition.load_image_file(f"{KNOWN_FACES_DIR}/{filename}")
+            encoding = face_recognition.face_encodings(image)[0]
+            known_faces.append(encoding)
+            known_names.append(os.path.splitext(filename)[0])
+    log("faces loaded")
 
     video_capture = cv2.VideoCapture(0)
 
@@ -48,7 +51,7 @@ def camera(man):
 
     while r:
         ret, frame = video_capture.read()
-        small_frame = cv2.resize(frame, (0, 0), fx=0.25, fy=0.25)
+        small_frame = cv2.resize(frame, (0, 0), fx=0.33, fy=0.33)
         rgb_small_frame = small_frame[:, :, ::-1]
 
         if process_this_frame_counter > 10:
@@ -73,10 +76,10 @@ def camera(man):
         output_base64 = []
 
         for (top, right, bottom, left), name in zip(face_locations, face_names):
-            top *= 4
-            right *= 4
-            bottom *= 4
-            left *= 4
+            top *= 3
+            right *= 3
+            bottom *= 3
+            left *= 3
             x = int((bottom - top) / 2)
             top_cropped = top - x
             right_cropped = right + x
@@ -119,7 +122,7 @@ def socket(man):
         log("Socket opened")
         try:
             while True:
-                await asyncio.sleep(0.033) # 30 fps
+                await asyncio.sleep(0.1) # 30 fps
                 await websocket.send(json.dumps(man[0]))
         except websockets.exceptions.ConnectionClosed:
             log("Socket closed")
