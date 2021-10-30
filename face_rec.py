@@ -42,14 +42,9 @@ def camera(man):
 
     video_capture = cv2.VideoCapture(0)
 
-    if video_capture.isOpened():
-        r, f = video_capture.read()
-    else:
-        r = False
-
     process_this_frame_counter = 0
 
-    while r:
+    while video_capture.isOpened():
         ret, frame = video_capture.read()
         small_frame = cv2.resize(frame, (0, 0), fx=0.33, fy=0.33)
         rgb_small_frame = small_frame[:, :, ::-1]
@@ -89,7 +84,7 @@ def camera(man):
 
             if face_image.any():
                 face_image_resized = cv2.resize(face_image, (256,256))
-                cv2.imshow(name, face_image_resized)
+                #cv2.imshow(name, face_image_resized)
                 retval, buffer = cv2.imencode('.jpg', face_image_resized)
                 base64_image = base64.b64encode(buffer).decode()
                 output_base64.append([name, base64_image])
