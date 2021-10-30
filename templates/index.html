@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Reconhecimento facial</title>
+        <link rel="stylesheet" type="text/css" href="static/css/style.css">
+        <script type="text/javascript" src="static/js/knockout-3.5.1.js" ></script>
+        <script type="text/javascript" src="static/js/socket.io.min.js" ></script>
+        <script type="text/javascript" src="static/js/script.js" ></script>
+    </head>
+    <body>
+        <div style="text-align: center" data-bind="foreach: images">
+            <div class="people">
+                <img data-bind="attr: { src: image() }" class="image" />
+                <div data-bind="text: name()" class="name"></div>
+            </div>
+        </div>
+    </body>
+</html>

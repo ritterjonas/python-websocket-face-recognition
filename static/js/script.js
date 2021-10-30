@@ -1,7 +1,3 @@
-openSocket = () => {
-
-}
-
 function People(name, image) {
     var self = this;
 
@@ -15,25 +11,25 @@ function ViewModel() {
 
     self.images = ko.observableArray();
 
-    self.onMessage = function(response) {
-        const arr = JSON.parse(response.data);
-        
+    self.onMessage = function(arr) {
         self.images(ko.utils.arrayMap(arr, self.addToArray));
 
         self.images.sort(function (l, r) { return l.name() > r.name() ? 1 : -1 })
     }
 
     self.addToArray = function(item) {
-        return new People(item[0], `data:image/jpg;base64,${item[1]}`);
+        return new People(item.name, `data:image/jpg;base64,${item.image}`);
     }
 
     self.init = function() {
-        let uri = "ws://" + window.location.hostname + ":8585";
-        socket = new WebSocket(uri);
-        socket.addEventListener('open', (e) => {
-            console.log('Opened');
+        var socket = io.connect('http://' + document.domain + ':' + location.port);
+
+        socket.on('connect' ,function() {
+            console.log('CONECTADO CHAMANDO CHECK');
+            socket.emit('check', { data: 'User Connected' })
         });
-        socket.addEventListener('message', self.onMessage);
+        
+        socket.on('image', self.onMessage);        
     }
 }
 
