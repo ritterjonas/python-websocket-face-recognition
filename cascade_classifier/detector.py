@@ -7,8 +7,8 @@ import numpy as np
 cascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
 
 camera = cv2.VideoCapture(0)
-camera.set(3, 800)
-camera.set(4, 400)
+# camera.set(3, 800)
+# camera.set(4, 400)
 
 with open('dataset_faces.dat', 'rb') as f:
 	all_face_encodings = pickle.load(f)
@@ -63,7 +63,7 @@ while camera.isOpened():
             name = recognizeFace(image, face)
         else:
             name, prevFace, tries = previousFace
-            if name == 'Unknown' and tries <= 50:
+            if name == 'Unknown' and tries <= 30:
                 if tries % 10 == 0:
                     name = recognizeFace(image, face)
                 tries += 1
@@ -71,11 +71,10 @@ while camera.isOpened():
         newList.append((name, face, tries))
 
     facesList = newList
-    print(newList)
     for (name, face, tries) in facesList:
         top, right, bottom, left = face
         cv2.rectangle(image, (left,top), (right, bottom), (100,0,100), 2)
-        cv2.putText(image, name, (left,bottom),cv2.FONT_HERSHEY_SIMPLEX, 1, (50,255,),2)
+        cv2.putText(image, name.split('-')[0], (left,bottom),cv2.FONT_HERSHEY_SIMPLEX, 1, (50,255,),2)
 
     cv2.imshow('Image',image)
 
