@@ -1,3 +1,4 @@
+import os
 import cv2
 import json
 import pickle
@@ -6,30 +7,33 @@ import numpy as np
 
 cascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
 
-camera = cv2.VideoCapture(0)
+camera = cv2.VideoCapture(1)
 # camera.set(3, 800)
 # camera.set(4, 400)
 
-with open('dataset_faces.dat', 'rb') as f:
-	all_face_encodings = pickle.load(f)
-
-known_names = list(all_face_encodings.keys())
-known_faces = np.array(list(all_face_encodings.values()))
-
+PICKLES_DIR = "pickles"
 facesList = []
 
 def recognizeFace(image, face):
     print('HORA DO SHOOW')
+
+    best_face_distance = 100
+    name = ''
     face_encoding = face_recognition.face_encodings(image, [face])[0]
-    matches = face_recognition.compare_faces(known_faces, face_encoding)
-    name = "Unknown"
 
-    face_distances = face_recognition.face_distance(known_faces, face_encoding)
-    best_match_index = np.argmin(face_distances)
-    if matches[best_match_index]:
-        name = known_names[best_match_index]
+    for filename in os.listdir(PICKLES_DIR):
+        with open(f"{PICKLES_DIR}/{filename}", 'rb') as f:
+	        known_faces = pickle.load(f)
 
-    return name
+        label = os.path.splitext(filename)[0]
+        face_distances = face_recognition.face_distance(known_faces, face_encoding)
+        average_face_distances = np.average(face_distances)
+
+        if (average_face_distances < best_face_distance):
+            best_face_distance = average_face_distances
+            name = label
+
+    return name if best_face_distance < 0.6 else 'Unknown'
 
 def findPreviousFace(top, right, bottom, left):
     for face in facesList:
