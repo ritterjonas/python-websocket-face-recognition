@@ -9,15 +9,6 @@ import numpy as np
 PICKLES_DIR = "pickles"
 
 class Camera(object):
-    def __init__(self):
-        self.known_faces = []
-        self.known_names = []
-        self.face_locations = []
-        self.face_encodings = []
-        self.face_names = []
-        self.output_base64 = []
-        self.video_capture = cv2.VideoCapture(0)
-
     def detect_faces(self, file_stream):
         img = face_recognition.load_image_file(file_stream)
         self.face_encodings = face_recognition.face_encodings(img)
@@ -34,21 +25,14 @@ class Camera(object):
 
                 label = os.path.splitext(filename)[0]
                 face_distances = face_recognition.face_distance(known_faces, face_encoding)
-                average_face_distances = np.average(face_distances)
+                min_face_distances = np.min(face_distances)
 
-                if (average_face_distances < best_face_distance):
-                    best_face_distance = average_face_distances
+                if (min_face_distances < best_face_distance):
+                    best_face_distance = min_face_distances
                     name = label
 
-            if best_face_distance < 0.6:
+            if best_face_distance < 0.55:
                 self.face_names.append(name)
 
         self.face_names.sort()
         return jsonify(list(dict.fromkeys(self.face_names)))
-
-
-def recognizeFace(image, face):
-    best_face_distance = 100
-    name = ''
-    face_encoding = face_recognition.face_encodings(image, [face])[0]
-
