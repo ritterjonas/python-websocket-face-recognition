@@ -1,41 +1,62 @@
-function People(name, image) {
-    var self = this;
-
-    self.name = ko.observable(name);
-    self.image = ko.observable(image);
-    self.timestamp = new Date().getTime();
-}
-
 function ViewModel() {
-    var self = this;
+  var self = this;
 
-    self.images = ko.observableArray();
+  self.init = function () {};
 
-    self.onMessage = function(arr) {
-        self.images(ko.utils.arrayMap(arr, self.addToArray));
+  self.proccess = function () {
+    var canvas = document.createElement("canvas");
+    canvas.height = video.videoHeight;
+    canvas.width = video.videoWidth;
+    var context = canvas.getContext("2d");
+    context.drawImage(video, 0, 0);
+    canvas.toBlob(function (blob) {
+      if (!blob) {
+        self.proccess();
+        return;
+      }
 
-        self.images.sort(function (l, r) { return l.name() > r.name() ? 1 : -1 })
-    }
+      const formData = new FormData();
+      formData.append("file", blob, "filename.png");
 
-    self.addToArray = function(item) {
-        return new People(item.name, `data:image/jpg;base64,${item.image}`);
-    }
-
-    self.init = function() {
-        var socket = io.connect('http://' + document.domain + ':' + location.port);
-
-        socket.on('connect' ,function() {
-            console.log('CONECTADO CHAMANDO CHECK');
-            socket.emit('check', { data: 'User Connected' })
-        });
-        
-        socket.on('image', self.onMessage);        
-    }
+      $.ajax({
+        url: "/detect",
+        data: formData,
+        processData: false,
+        contentType: false,
+        type: "POST",
+        success: function (data) {
+          console.log(data);
+        },
+        complete: function () {
+          self.proccess();
+        },
+      });
+    });
+  };
 }
 
 var viewModel = new ViewModel();
-viewModel.init();
 
-window.onload = function() {
-    ko.applyBindings(viewModel);
-}
+$(function () {
+  navigator.mediaDevices
+    .getUserMedia({
+      video: {
+        deviceId: {
+          exact:
+            "ff9225ebf76c197e41c2d3e35b8039edc9d063c0e0309d902e37834e6bfc9e77",
+        },
+      },
+    })
+    .then(function (mediaStream) {
+      var video = document.querySelector("#video");
+
+      video.srcObject = mediaStream;
+      video.play();
+      viewModel.proccess();
+    })
+    .catch(function (err) {
+      console.log("Não há permissões para acessar a webcam");
+    });
+
+  ko.applyBindings(viewModel);
+});
