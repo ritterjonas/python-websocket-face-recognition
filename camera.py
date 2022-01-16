@@ -11,7 +11,8 @@ PICKLES_DIR = "pickles"
 class Camera(object):
     def detect_faces(self, file_stream):
         img = face_recognition.load_image_file(file_stream)
-        self.face_encodings = face_recognition.face_encodings(img)
+        face_locations = face_recognition.face_locations(img, model="hog")
+        self.face_encodings = face_recognition.face_encodings(img, face_locations)
 
         self.face_names = []
 
